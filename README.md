@@ -108,4 +108,4 @@ If you encounter any problems or have suggestions, please open an issue on GitHu
 
 ## License
 
-[MIT](LICENSE) © 2024 [Nazdrido](https://github.com/nazdridoy)
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
