@@ -8,6 +8,12 @@ export default {
 
     // Handle POST request to save URL
     if (request.method === 'POST' && path.startsWith('/v1/save/')) {
+      // Validate API key for save operations only
+      const authHeader = request.headers.get('Authorization');
+      if (!authHeader || `Bearer ${env.API_KEY}` !== authHeader) {
+        return new Response('Unauthorized', { status: 401 });
+      }
+
       const uniqueKey = path.split('/v1/save/')[1];
       
       if (!uniqueKey) {
@@ -22,8 +28,27 @@ export default {
           return new Response('Invalid URL format', { status: 400 });
         }
 
-        // Store in KV
-        await env[KV_NAMESPACE].put(uniqueKey, body.url);
+        // Check if key exists and is immutable
+        const existingValue = await env[KV_NAMESPACE].get(uniqueKey, 'json');
+        if (existingValue && existingValue.immutable !== false) {  // Only check immutable if key exists
+          return new Response(JSON.stringify({
+            status: 'error',
+            message: 'Key exists and is immutable'
+          }), {
+            status: 400,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+        }
+
+        // Store in KV as JSON
+        const valueToStore = {
+          url: body.url,
+          immutable: body.immutable !== false  // true by default unless explicitly false
+        };
+        
+        await env[KV_NAMESPACE].put(uniqueKey, JSON.stringify(valueToStore));
         
         return new Response(JSON.stringify({
           status: 'success',
@@ -49,14 +74,15 @@ export default {
 
       try {
         // Get from KV
-        const storedUrl = await env[KV_NAMESPACE].get(uniqueKey);
+        const storedValue = await env[KV_NAMESPACE].get(uniqueKey, 'json');
         
-        if (!storedUrl) {
+        if (!storedValue) {
           return new Response('Key not found', { status: 404 });
         }
 
         return new Response(JSON.stringify({
-          url: storedUrl
+          url: storedValue.url,
+          immutable: storedValue.immutable
         }), {
           headers: {
             'Content-Type': 'application/json'
