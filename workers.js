@@ -1,13 +1,4 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run "npm run dev" in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run "npm run deploy" to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
-
+const KV_NAMESPACE = 'nazkvhubstore';
 
 export default {
   async fetch(request, env, ctx) {
@@ -32,7 +23,7 @@ export default {
         }
 
         // Store in KV
-        await env.nazkvhubstore.put(uniqueKey, body.url);
+        await env[KV_NAMESPACE].put(uniqueKey, body.url);
         
         return new Response(JSON.stringify({
           status: 'success',
@@ -58,7 +49,7 @@ export default {
 
       try {
         // Get from KV
-        const storedUrl = await env.nazkvhubstore.get(uniqueKey);
+        const storedUrl = await env[KV_NAMESPACE].get(uniqueKey);
         
         if (!storedUrl) {
           return new Response('Key not found', { status: 404 });
