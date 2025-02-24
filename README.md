@@ -20,9 +20,9 @@ Content-Type: application/json
 
 {
   "url": "https://example.com",
-  "immutable": true  // Optional, defaults to true
+  "immutable": true  
 }
-
+```
 ### Retrieve URL
 ```http
 GET /v1/get/{key}
