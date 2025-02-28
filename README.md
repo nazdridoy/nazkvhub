@@ -2,6 +2,10 @@
 
 A simple and efficient key-value URL storage service built on Cloudflare Workers KV. Store and retrieve URLs with optional immutability support.
 
+## Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/nazdridoy/nazkvhub)
+
 ## Features
 
 - Store URLs with unique keys
